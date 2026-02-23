@@ -22,11 +22,13 @@ if (pass.length < 6) {
     return;
 }
 
-if (emailValue.includes('@') === false) {
-    res.textContent = "Ошибка: Email должен содержать символ @";
+const atIndex = emailValue.indexOf('@');
+  if (atIndex <= 0 || atIndex === emailValue.length - 1 || emailValue.length < 5) {
+    res.textContent = "Ошибка: введите корректный Email (например, user@mail.ru).";
     res.style.color = "red";
     return;
-}
+  }
+
     res.textContent = "Доступ разрешён";
     res.style.color = "green";
 }
@@ -34,7 +36,7 @@ document.getElementById('discountBtn').addEventListener('click', calculateDiscou
 function calculateDiscount() {
   const sum = Number(document.getElementById("sumInput").value);
   const res = document.getElementById("discountResult");
-if (Number.isNaN(sum) || sum <= 0) {
+if (Number.isNaN(sum) || sum <= 0.01) {
     res.textContent = "Ошибка: введите сумму";
     res.style.color = "red";
 return;
@@ -59,31 +61,40 @@ let discountPercent = 0;
 }
 document.getElementById('convertBtn').addEventListener('click', convertCurrency);
 function convertCurrency() {
-  const amount = Number(document.getElementById("amountInput").value);
+  const inputField = document.getElementById("amountInput");
+  const amount = Number(inputField.value);
   const currency = document.getElementById("currencySelect").value;
   const res = document.getElementById("convertResult");
 
-  if (Number.isNaN(amount) || amount <= 0) {
-        res.textContent = "Ошибка: введите корректную сумму.";
-        res.style.color = "red";
-return;
-}
+  const MAX_AMOUNT = Number.MAX_SAFE_INTEGER; 
 
-let result = 0;
-switch (currency) {
-  case "USD": 
-      result = amount / RATE_USD; 
-      break;
+  if (inputField.value === "" || Number.isNaN(amount) || amount <= 0) {
+    res.textContent = `Ошибка: введите сумму от 0.01 до ${MAX_AMOUNT} BYN.`;
+    res.style.color = "red";
+    return; 
+  }
 
-  case "EUR":
-      result = amount / RATE_EUR;
-      break;
-  case "RUB":
-      result = amount / RATE_RUB;
-      break;
-}
+  if (amount > MAX_AMOUNT) {
+    res.textContent = `Ошибка: максимальная сумма — ${MAX_AMOUNT} BYN.`;
+    res.style.color = "red";
+    return;
+  }
+
+  let result = 0;
+  switch (currency) {
+    case "USD": 
+        result = amount / RATE_USD; 
+        break;
+    case "EUR":
+        result = amount / RATE_EUR;
+        break;
+    case "RUB":
+        result = amount / RATE_RUB;
+        break;
+  }
   res.textContent = `${amount} BYN = ${result.toFixed(2)} ${currency}`;
-}
+  res.style.color = "green";
+  }
 
 document.getElementById('quizBtn').addEventListener('click', startQuiz);
 function startQuiz() {
