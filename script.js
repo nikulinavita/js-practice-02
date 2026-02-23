@@ -22,9 +22,10 @@ if (pass.length < 6) {
     return;
 }
 
-const atIndex = emailValue.indexOf('@');
-  if (atIndex <= 0 || atIndex === emailValue.length - 1 || emailValue.length < 5) {
-    res.textContent = "Ошибка: введите корректный Email (например, user@mail.ru).";
+const emailPattern = /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/;
+
+  if (emailPattern.test(emailValue) === false) {
+    res.textContent = "Ошибка: введите корректный Email";
     res.style.color = "red";
     return;
   }
@@ -34,15 +35,27 @@ const atIndex = emailValue.indexOf('@');
 }
 document.getElementById('discountBtn').addEventListener('click', calculateDiscount);
 function calculateDiscount() {
-  const sum = Number(document.getElementById("sumInput").value);
+  const inputField = document.getElementById("sumInput"); // Берем само поле
+  const sum = Number(inputField.value);
   const res = document.getElementById("discountResult");
-if (Number.isNaN(sum) || sum <= 0.01) {
-    res.textContent = "Ошибка: введите сумму";
-    res.style.color = "red";
-return;
-}
 
-let discountPercent = 0; 
+  const MAX_AMOUNT = Number.MAX_SAFE_INTEGER; 
+
+  // СУПЕР-ЗАЩИТА: Если браузер сломался от длины числа (badInput) ИЛИ сумма больше лимита
+  if (inputField.validity.badInput || sum > MAX_AMOUNT) {
+    res.textContent = `Ошибка: сумма слишком велика (максимум ${MAX_AMOUNT}).`;
+    res.style.color = "red";
+    return;
+  }
+
+  // Если поле вообще пустое или ввели 0 (или минус)
+  if (inputField.value === "" || Number.isNaN(sum) || sum < 0.01) {
+    res.textContent = "Ошибка: введите корректную сумму от 0.01 BYN.";
+    res.style.color = "red";
+    return;
+  }
+
+  let discountPercent = 0; 
 
   if (sum < 100) {
     discountPercent = 0;
@@ -59,6 +72,7 @@ let discountPercent = 0;
   res.textContent = `Сумма скидки: ${discountAmount.toFixed(2)} BYN. Итоговая сумма: ${finalSum.toFixed(2)} BYN. ${delivery}`;
   res.style.color = "blue";
 }
+
 document.getElementById('convertBtn').addEventListener('click', convertCurrency);
 function convertCurrency() {
   const inputField = document.getElementById("amountInput");
@@ -140,3 +154,4 @@ res.textContent = `Ваш результат: ${score}/3`;
 res.style.color = "green";
 
 }
+  
